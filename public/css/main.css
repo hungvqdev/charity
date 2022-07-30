@@ -1,0 +1,17 @@
+.endproject{
+    border-color: #858796;
+}
+
+.verticalAlign {
+    vertical-align: middle !important;
+}
+
+.title-text {
+    text-align: left !important;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }

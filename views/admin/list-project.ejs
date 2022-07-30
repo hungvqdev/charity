@@ -1,0 +1,220 @@
+<%- include('../includes/head.ejs') %>
+<link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link href="/css/admin.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+
+<body>  
+    <header class="masthead">
+          <!-- Page Wrapper -->
+    <div id="wrapper">
+
+ <%- include('../includes/navigation-admin.ejs') %>
+  
+    <!-- End of Page Wrapper -->
+       
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <br><br>
+        <!-- Page Heading -->
+        <h1 class="h3 mb-2 text-gray-800">Quản lý dự án</h1>
+        <br>
+
+        <% if (message) { %>  
+      <!-- Alert -->
+      <div class="alert <%= styleAlert %> alert-dismissible fade show " role="alert" >
+         <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <% } %>
+      <!-- DataTales Example -->
+      <div class="card shadow mb-4">
+        <div class="card-body">  
+          <div class="row g-5">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-primary">Dự án đang diễn ra</span>
+            </h4>
+            <div class="col-lg-8 col-12">
+              <div class="table-responsive">
+                <table class="table" id="dataTable" cellspacing="0">     
+                  <thead>
+                    <tr>
+                        <th>Tên Dự án</th>
+                        <th>Tiến trình</th>
+                        <th style="width: 9%;"></th>
+                        <th style="width: 9%;"></th>
+                        <th style="width: 9%;"></th>
+                    </tr>
+                </thead>         
+                    <tbody>  
+                      <% if (projects.length > 0) { %>
+                        <% for (let proj of projects) { %>
+                          <% if (proj.donate.percentageDonate < 100) { %> 
+                           <% if (Math.ceil((proj.endTime - new Date()) / (1000 * 60 * 60 * 24)) > 0) { %>
+                            <tr>
+                              <td class="verticalAlign "><h6 class="my-0 title-text"><%= proj.title %></h6>
+                                  <small class="text-muted">Còn <%= Math.ceil((proj.endTime - new Date()) / (1000 * 60 * 60 * 24)) %> ngày</small></td>
+                              <td style="width: 42%;">
+                                <small class="my-2"><%= proj.donate.totalMoney.toLocaleString('en-US') %> VND /<%= proj.maxMoney.toLocaleString('en-US') %> VND</small>
+                                <small class="progress">
+                                  <div class="progress-bar" role="progressbar" style="width: <%= proj.donate.percentageDonate %>%" aria-valuenow="<%= proj.donate.percentageDonate %>" aria-valuemin="0" aria-valuemax="100"><%= proj.donate.percentageDonate %>%</div>
+                                </small>
+                              
+                                  
+                              <small class="my-2">Lượt quyên góp: <%= proj.donate.totalDonate %></small>                                                  
+                              </td>
+                              <td class="verticalAlign pr-0" style="width: 9%;">
+                                <a href="/admin/list-project/<%= proj._id %>" class="btn btn-dark position-relative">
+                                  <i class="fas fa-donate"></i>
+                                  <% if (proj.donate.countDonateWait > 0 ){ %>
+                                   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                      <%= proj.donate.countDonateWait %>
+                              
+                                  <% } %>
+                                </a>
+                              </td>
+                              <td class="verticalAlign pr-0" style="width: 9%;">               
+                                  <a class="btn btn-primary btn-icon-split " href="/admin/edit-project/<%= proj._id %>">
+                                    <span class="icon text-white-60">
+                                      <i class="fas fa-edit"></i>
+                                    </span>
+                                  </a>                                
+                              </td>
+                              <td class="verticalAlign pl-0" style="width: 9%;">
+                                <button class="btn btn-danger btn-icon-split" data-bs-toggle="modal" data-bs-target="#deleteModal-<%= proj._id %>"> <span class="icon text-white-60">
+                                  <i class="far fa-trash-alt"></i></span>
+                                </button>
+                                <!-- Delete Modal -->
+                            <form action="/admin/list-project" method="POST">                                   
+                              <div class="modal fade" id="deleteModal-<%= proj._id %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="deleteModalLabel">Bạn có chắc chắn muốn xóa ?</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                      Việc xóa sẽ mất mất dữ liệu. Bạn đã chắc chắn xóa hãy ấn đồng ý
+                                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                      <input type="hidden" value="<%= proj._id %>" id="projectDeleteId" name="projectDeleteId">
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                      <button type="submit" class="btn btn-primary"  href="/admin/list-project">Đồng ý</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>  
+                              </td>
+                          </tr>   
+                           <% } %>   
+                          <% } %>
+                        <% } %>
+                      <% } %>  
+                    </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>    
+      </div>
+      
+      <div class="card shadow mb-4">
+        <div class="card-body">  
+          <div class="row g-5">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-primary">Dự án đã kết thúc</span>
+            </h4>
+            <div class="col-lg-8 col-12">
+              <div class="table-responsive">
+                <table class="table" id="dataTable2" cellspacing="0">     
+                  <thead>
+                    <tr>
+                        <th>Tên Dự án</th>
+                        <th>Tiến trình</th>
+                        <th style="width: 9%;"></th>
+                        <th style="width: 9%;"></th>
+                        <th style="width: 9%;"></th>
+                    </tr>
+                </thead>         
+                    <tbody>  
+                      <% if (projects.length > 0) { %>
+                        <% for (let proj of projects) { %>
+                          <% if (Math.ceil((proj.endTime - new Date()) / (1000 * 60 * 60 * 24)) <= 0 || proj.donate.percentageDonate >= 100) { %> 
+                            <tr>
+                              <td class="verticalAlign "><h6 class="my-0 title-text"><%= proj.title %></h6>
+                                  <small class="text-muted">Còn <%= Math.ceil((proj.endTime - new Date()) / (1000 * 60 * 60 * 24)) %> ngày</small></td>
+                              <td style="width: 42%;">
+                                <small class="my-2"><%= proj.donate.totalMoney.toLocaleString('en-US') %> VND /<%= proj.maxMoney.toLocaleString('en-US') %> VND</small>
+                                <small class="progress">
+                                  <div class="progress-bar" role="progressbar" style="width: <%= proj.donate.percentageDonate %>%" aria-valuenow="<%= proj.donate.percentageDonate %>" aria-valuemin="0" aria-valuemax="100"><%= proj.donate.percentageDonate %>%</div>
+                                </small>
+                              
+                                  
+                              <small class="my-2">Lượt quyên góp: <%= proj.donate.totalDonate %></small>                                                  
+                              </td>
+                              <td class="verticalAlign" style="width: 9%;">
+                                <a href="/admin/list-project/<%= proj._id %>" class="btn btn-dark position-relative">
+                                  <i class="fas fa-donate"></i>
+                                </a>
+                              </td>
+                              <td class="verticalAlign  pr-0" style="width: 9%; padding-left: 3px;">               
+                                <a class="btn btn-primary btn-icon-split " href="/admin/edit-project/<%= proj._id %>">
+                                  <span class="icon text-white-60">
+                                    <i class="fas fa-edit"></i>
+                                  </span>
+                                </a>                                 
+                              </td>
+                              <td class="verticalAlign pl-0" style="width: 9%;">
+                                <button class="btn btn-danger btn-icon-split" data-bs-toggle="modal" data-bs-target="#deleteModal-<%= proj._id %>"> <span class="icon text-white-60">
+                                  <i class="far fa-trash-alt"></i></span>
+                                </button>
+                                <!-- Delete Modal -->
+                                <form action="/admin/list-project" method="POST">                                   
+                                  <div class="modal fade" id="deleteModal-<%= proj._id %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="deleteModalLabel">Bạn có chắc chắn muốn xóa ?</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          Việc xóa sẽ mất mất dữ liệu. Bạn đã chắc chắn xóa hãy ấn đồng ý
+                                          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                          <input type="hidden" value="<%= proj._id %>" id="projectDeleteId" name="projectDeleteId">
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                          <button type="submit" class="btn btn-primary"  href="/admin/list-project">Đồng ý</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </form> 
+                              </td>
+                          </tr>  
+ 
+                          <% } %>
+                        <% } %>
+                      <% } %>  
+                    </tbody>
+                </table>
+              </div>
+            </div>   
+          </div>
+        </div>      
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+   
+<!-- End of Main Content -->
+    </header>
+    
+<%- include('../includes/javascript.ejs') %>
+<%- include('../includes/end.ejs') %>
+
